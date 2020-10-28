@@ -14,7 +14,7 @@ User.prototype.validate = function () {
   let con = db.dbfunc;
   let usersCollection = con.collection("users");
   return new Promise(async (resolve, reject) => {
-    if (this.password == "") {
+    if (this.password === "") {
       this.errors.push(
         "Password must be between 8-30 alphanumeric characters."
       );
@@ -31,13 +31,13 @@ User.prototype.validate = function () {
       );
     }
 
-    if (this.confirmPassword == "") {
+    if (this.confirmPassword === "") {
       this.errors.push("Confirm password is required.");
     } else if (this.password !== this.confirmPassword) {
       this.errors.push("Password and confirm password must match.");
     }
 
-    if (this.email == "") {
+    if (this.email === "") {
       this.errors.push("Email is required.");
     } else if (!validator.isEmail(this.email)) {
       this.errors.push("You must enter a valid email.");
@@ -68,13 +68,13 @@ User.prototype.register = function () {
     this.errors.push(err);
   }
 
-  if (fields != null || (fields !== "" && fields.email != "")) {
+  if (fields !== null || (fields !== "" && fields.email !== "")) {
     this.email = fields.email.toLowerCase().trim();
     this.password = fields.password;
     this.confirmPassword = fields.confirmPassword;
   }
 
-  if (files != null || (files !== "" && files.photo.path != "")) {
+  if (files !== null || (files !== "" && files.photo.path !== "")) {
     let photo = {
       data: fs.readFileSync(files.photo.path),
       name: files.photo.name,
@@ -84,7 +84,7 @@ User.prototype.register = function () {
     this.photo = photo;
   }
 
-  if (this.photo.size == 0) {
+  if (this.photo.size === 0) {
     this.errors.push("Photo is required.");
   } else if (!validator.isMimeType(this.photo.contentType)) {
     this.errors.push("Photo must be in jpg, png, giff, tiff or webp format");
