@@ -32,11 +32,13 @@ main().catch(console.error);
 
 //middlewares
 app.use(morgan("dev"));
+
 //to be able to work with form data and json data
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
+app.use(cors({ origin: true }));
 
 //user routes
 app.use("/api", require("./router"));
