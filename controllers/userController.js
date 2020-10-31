@@ -106,3 +106,44 @@ exports.profileBasicData = async (req, res) => {
       res.send(err);
     });
 };
+
+exports.profileUpdateBasicData = async (req, res) => {
+  //console.log("fromUserConrller", req.params);
+  let user = new User(req.params);
+
+  user
+    .getProfileById()
+    .then((userDoc) => {
+      res.send(userDoc);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+};
+
+exports.apiProfileUpdateBasicData = (req, res) => {
+  let form = new formidable.IncomingForm();
+  form.keepExtensions = true;
+  form.parse(req, (err, fields, files) => {
+    //console.log(err, fields, files);
+    console.log("param", req.params.id);
+    //console.log(req.email, "id", req.id);
+    let param = req.params.id;
+    let user = new User({ err, fields, files, param });
+
+    try {
+      user
+        .update()
+        .then((userDoc) => {
+          res.send(userDoc);
+          // console.log(userDoc);
+        })
+        .catch((err) => {
+          res.send(err);
+        });
+    } catch (e) {
+      //console.log(e);
+      return res.status(400).json({ error: e });
+    }
+  });
+};

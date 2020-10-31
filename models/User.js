@@ -166,4 +166,61 @@ User.prototype.getProfileById = function () {
   });
 };
 
+User.prototype.update = function () {
+  if (this.data == "" || this.data == null || this.data == undefined) {
+    this.errors.push("Photo");
+    return this.errors;
+  }
+  // console.log("incoming data in user model", this.data);
+  let { err, fields, files, param } = this.data;
+  //console.log("files from model", files);
+  //console.log("fields from model", fields);
+  // console.log("param from model", param);
+  if (err) {
+    this.errors.push(err);
+  }
+
+  if (files !== null || (files !== "" && files.photo.path !== "")) {
+    let photo = {
+      data: fs.readFileSync(files.photo.path),
+      name: files.photo.name,
+      contentType: files.photo.type,
+      size: files.photo.size,
+    };
+    this.photo = photo;
+    //console.log({ name: photo.name });
+  }
+
+  if (this.photo.size === 0) {
+    this.errors.push("Photo is required.");
+  } else if (!validator.isMimeType(this.photo.contentType)) {
+    this.errors.push("Photo must be in jpg, png, giff, tiff or webp format");
+  }
+  // console.log("photo", this.photo);
+  return new Promise(async (resolve, reject) => {
+    if (!this.errors.length) {
+      let con = db.dbfunc;
+      let usersCollection = con.collection("users");
+      //  console.log("email", this.email, "photo", this.photo);
+      try {
+        await usersCollection
+          .findOneAndUpdate(
+            { _id: ObjectId(param) },
+            { $set: { photo: this.photo } },
+            { new: true }
+          )
+          .then((result) => {
+            // console.log("result", result);
+            resolve(result);
+            console.log(email, this.photo);
+          })
+          .catch((e) => {
+            reject("Email not found", e);
+          });
+      } catch (e) {
+        reject("Try again later", e);
+      }
+    }
+  });
+};
 module.exports = User;
