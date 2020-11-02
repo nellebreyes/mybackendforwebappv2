@@ -66,29 +66,38 @@ exports.apiRegister = (req, res) => {
   let form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.parse(req, (err, fields, files) => {
-    let user = new User({ err, fields, files });
-    try {
-      user
-        .register()
-        .then((result) => {
-          // console.log(result);
-          res.json({
-            token: jwt.sign(
-              { _id: user.data._id, email: user.data.email },
-              process.env.JWTSECRET,
-              { expiresIn: "365d" }
-            ),
-            email: user.data.email,
-            id: user.data.id,
-            message: "success",
+    //  console.log("fields", fields, "files", files);
+    if (
+      JSON.stringify(fields) == JSON.stringify({}) ||
+      JSON.stringify(files) == JSON.stringify({})
+    ) {
+      //console.log("all are required");
+      return res.json({ error: "All fields are required" });
+    } else {
+      let user = new User({ err, fields, files });
+      try {
+        user
+          .register()
+          .then((result) => {
+            // console.log(result);
+            res.json({
+              token: jwt.sign(
+                { _id: user.data._id, email: user.data.email },
+                process.env.JWTSECRET,
+                { expiresIn: "365d" }
+              ),
+              email: user.data.email,
+              id: user.data.id,
+              message: "success",
+            });
+          })
+          .catch((e) => {
+            return res.send("The email you entered is already on file.");
           });
-        })
-        .catch((e) => {
-          return res.status(400).send({ error: e });
-        });
-    } catch (e) {
-      //console.log(e);
-      return res.status(400).json({ error: e });
+      } catch (e) {
+        //console.log(e);
+        return res.status(400).json({ error: e });
+      }
     }
   });
 };

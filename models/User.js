@@ -58,39 +58,36 @@ User.prototype.register = function () {
   //step 1 validate user data //since we added async function to validate method, we need to make sure that that is
   //completed before we allow other steps to happen
   // console.log(this.data);
-  if (this.data == "" || this.data == null || this.data == undefined) {
-    this.errors.push("All fields are required");
-    return this.errors;
-  }
-
-  let { err, fields, files } = this.data;
-  if (err) {
-    this.errors.push(err);
-  }
-
-  if (fields !== null || (fields !== "" && fields.email !== "")) {
-    this.email = fields.email.toLowerCase().trim();
-    this.password = fields.password;
-    this.confirmPassword = fields.confirmPassword;
-  }
-
-  if (files !== null || (files !== "" && files.photo.path !== "")) {
-    let photo = {
-      data: fs.readFileSync(files.photo.path),
-      name: files.photo.name,
-      contentType: files.photo.type,
-      size: files.photo.size,
-    };
-    this.photo = photo;
-  }
-
-  if (this.photo.size === 0) {
-    this.errors.push("Photo is required.");
-  } else if (!validator.isMimeType(this.photo.contentType)) {
-    this.errors.push("Photo must be in jpg, png, giff, tiff or webp format");
-  }
 
   return new Promise(async (resolve, reject) => {
+    // if (this.data == "" || this.data == null || this.data == undefined) {
+    //   this.errors.push("All fields are required");
+    //   return this.errors;
+    // }
+
+    let { fields, files } = this.data;
+
+    if (fields !== null || (fields !== "" && fields.email !== "")) {
+      this.email = fields.email.toLowerCase().trim();
+      this.password = fields.password;
+      this.confirmPassword = fields.confirmPassword;
+    }
+
+    if (files !== null || (files !== "" && files.photo.path !== "")) {
+      let photo = {
+        data: fs.readFileSync(files.photo.path),
+        name: files.photo.name,
+        contentType: files.photo.type,
+        size: files.photo.size,
+      };
+      this.photo = photo;
+    }
+
+    if (this.photo.size === 0) {
+      this.errors.push("Photo is required.");
+    } else if (!validator.isMimeType(this.photo.contentType)) {
+      this.errors.push("Photo must be in jpg, png, giff, tiff or webp format");
+    }
     await this.validate();
     // Step 2: Only if there are no validation errors
     // then save the user data into a database
